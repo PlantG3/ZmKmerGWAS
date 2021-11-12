@@ -1,0 +1,126 @@
+---
+title: "Pheno Data from Jacob"
+output: NULL
+author: Jinliang Yang
+---
+
+Hello all,
+ 
+Here is the training and testing set data based on kmeans clustering of the cultivars using the 1 Million random kmers data.
+ 
+I have attached a file for each data set (282 training, 282 testing, and NAMtesting). Each file has a column for the fold number (0-5), a column for the set it is in (this is redundant with the file name) and a column for the Taxa (cultivars in that fold and set). The 282 have had all NAM founders removed so that all of our training will be done without the NAM included.  For each fold there is a 282Training Set, 282Testing Set, and a NAMTesting Set.  In some cases there are no NAM founders within a cluster so that set is zero for some folds.  Here are the numbers of cultivars in each fold’s Train, test, and NAM test set:
+ 
+Fold       Train      Test        Test_NAM
+0             200         45           4
+1             232         13           0
+2             151        94           0
+3             226        19           3
+4             225        20           1
+5             191        54           18
+ 
+As you can see, some folds have larger testing sets than others.  I would like to have had more similar test set sizes, but this is the way the clustering came out.  Jinliang, do you have any concerns about this or do you think it is ok?  One strategy we could use after the fact is to randomly drop test set cultivars so that all test sets are the same size…
+ 
+Cheng, for your GWAS analysis all you need to worry about is the 282Train file.  You need to run 6 different GWAS and determine the significant k-mers for each.  You should be able to just take the cultivars for fold 0 and run a GWAS on them, then the ones for fold 1 and run a separate GWAS on them, etc.  After you run the analysis and find the significant kmers, then I will need a file/list containing those kmers and their abundances across all cultivars (a different file/list for each fold).
+ 
+Let me know if that makes sense or if we should change anything in this strategy before moving forward.
+ 
+Thanks,
+ 
+Jacob
+
+```{r setup, include=TRUE}
+#setwd("~/Documents/Github/pvpDiallel/")
+knitr::opts_knit$set(root.dir=normalizePath('../'))
+```
+
+# Training set0
+
+```{r}
+
+getpheno <- function(trainfile="data/random_6k_folds_282Train_set.csv",
+                     testfile="data/random_6k_folds_282Test_set.csv",
+                     outfile="largedata/pheno/set"){
+        
+        tn <- read.csv(trainfile)
+        # ln <- read.table("largedata/genotype/lines.txt", header=TRUE)
+
+        test <- read.csv(testfile)
+        pheno <- read.csv("data/kmer_FT_phe_sort.csv")
+        pheno <- subset(pheno, !is.na(DTS)) 
+        for(i in 0:10){
+          tn0 <- subset(tn, Fold == i)
+          # test <- merge(tn0, ln, by.x="Taxa", by.y="FID")
+         
+          # training data
+          out1 <- merge(tn0, pheno[, c("lines", "DTS")], by.x="Taxa", by.y="lines")
+          out1 <- out1[, c("Taxa", "DTS", "Set")]
+          names(out1) <- c("FID", "DTS", "Fix")
+          out1$Fix <- 1
+
+          write.table(out1, paste0(outfile, i, "_train.txt"), sep="\t", row.names=FALSE, quote=FALSE)
+          
+          test0 <- subset(test, Fold == i)
+          # test data
+          out2 <- merge(test0, pheno[, c("lines", "DTS")], by.x="Taxa", by.y="lines")
+          out2 <- out2[, c("Taxa", "DTS", "Set")]
+          names(out2) <- c("FID", "DTS", "Fix")
+          out2$Fix <- 1
+          write.table(out2, paste0(outfile, i, "_test.txt"), sep="\t", row.names=FALSE, quote=FALSE)
+        }
+}
+
+
+### apply the function
+
+getpheno(trainfile="data/random_6k_folds_282Train_set.csv",
+         testfile="data/random_6k_folds_282Test_set.csv",
+         outfile="largedata/pheno/set")
+
+
+```
+
+## Random 
+
+```{r}
+getpheno(trainfile="data/random_6k_folds_282Train_set.csv",
+         testfile="data/random_6k_folds_NAMTest_set.csv",
+         outfile="largedata/nam/set")
+
+
+```
+
+## Kmean
+```{r}
+getpheno(trainfile="data/kmeans_6k_folds_282Train_set.csv",
+         testfile="data/kmeans_6k_folds_282Test_set.csv",
+         outfile="largedata/FT/set")
+
+```
+
+## Kmean NAM
+```{r}
+getpheno(trainfile="data/kmeans_6k_folds_282Train_set.csv",
+         testfile="data/random_6k_folds_NAMTest_set.csv",
+         outfile="largedata/kmean_nam/set")
+
+```
+
+-----------
+3/11/2021
+
+### Random:
+
+```{r}
+getpheno(trainfile="data/random_11k_folds_282Train_set_12Dec2020.csv",
+         testfile="data/random_11k_folds_282Test_set_12Dec2020.csv",
+         outfile="largedata/FT/random/set")
+
+```
+
+## Kmean
+```{r}
+getpheno(trainfile="data/kmeans_11k_folds_282Train_set_12Dec2020.csv",
+         testfile="data/kmeans_11k_folds_282Test_set_12Dec2020.csv",
+         outfile="largedata/FT/kmeans/set")
+
+```

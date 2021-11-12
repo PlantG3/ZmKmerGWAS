@@ -1,0 +1,52 @@
+---
+title: "Genotypic Data from Gen"
+output: NULL
+author: Jinliang Yang
+---
+
+/common/jyanglab/gxu6/project/07_282panel/01GCTB/genotype
+
+
+```{bash, eval=FALSE}
+cp /common/jyanglab/gxu6/project/07_282panel/01GCTB/genotype/282_GCTB_G largedata/
+cd largedata
+plink -bfile 282_GCTB_G --recode A --out 282_GCTB_G
+```
+
+
+### recode the SNP
+
+```{r}
+library("data.table")
+
+df <- fread("largedata/282_GCTB_G.raw", data.table=FALSE)
+df <- df[, -2:-6]
+
+### remove duplidated ids
+id <- data.frame(sid=names(df), idx=1)
+
+idx <- grep("10-5444574", id$sid)
+
+names(df) <- gsub("-", "_", names(df))
+
+fwrite(df, "largedata/genotype/raw_snp0.7M.txt", na=1, sep="\t", row.names=FALSE, quote=FALSE)
+
+fwrite(df[,1:2], "largedata/genotype/lines.txt", na=1, sep="\t", row.names=FALSE, quote=FALSE)
+
+
+## impute missing to 1
+df[is.na(df)] <- 1
+
+### impute 0=> -10, 1 =>0, 2 => 10
+df[df == 0] <- -10
+df[df == 1] <- 0
+df[df == 2] <- 10
+```
+
+```{bash}
+sed -i 's/\b0\b/-10/g' raw_snp0.7M.txt
+sed -i 's/\b1\b/0/g' raw_snp0.7M.txt
+sed -i 's/\b2\b/10/g' raw_snp0.7M.txt
+```
+
+

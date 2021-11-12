@@ -1,0 +1,132 @@
+---
+title: "Genotype data from Gen"
+output: NULL
+author: Jinliang Yang
+---
+
+
+/common/jyanglab/gxu6/project/07_282panel_GCTB/genotype
+
+### FT Kmeans
+
+```{r}
+library("huskeR")
+
+trainfile1 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/FT/kmeans", 
+                        pattern="train", full.names=TRUE)
+testfile1 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/FT/kmeans", 
+                      pattern="test", full.names=TRUE)
+
+inputdf <- data.frame(pi=0.995,
+   geno="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/genotype/raw_snp0.7M.txt.newbin",
+   trainpheno=trainfile1,
+   testpheno=testfile1,
+   chainLength=41000, burnin=1000, varGenotypic=2, varResidual=1,
+   out=gsub("_train.txt|.*\\/", "", trainfile1))
+
+run_GenSel4(inputdf, cv=TRUE, 
+            inpdir="largedata/FT/kmeans", 
+            cmdno=1,
+            shid = "slurm-script/run_gensel_array1.sh", remove=FALSE,
+            email="yangjl0930@gmail.com", 
+            runinfo = c(TRUE, "jyanglab", 2, "2G", "8:00:00") )
+
+```
+
+### FT random
+
+```{r}
+trainfile2 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/FT/random", 
+                        pattern="train", full.names=TRUE)
+testfile2 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/FT/random", 
+                      pattern="test", full.names=TRUE)
+
+inputdf <- data.frame(pi=0.995,
+   geno="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/genotype/raw_snp0.7M.txt.newbin",
+   trainpheno=trainfile2,
+   testpheno=testfile2,
+   chainLength=41000, burnin=1000, varGenotypic=2, varResidual=1,
+   out=gsub("_train.txt|.*\\/", "", trainfile2))
+
+run_GenSel4(inputdf, cv=TRUE, 
+            inpdir="largedata/FT/random", 
+            cmdno=1,
+            shid = "slurm-script/run_gensel_array2.sh", remove=FALSE,
+            email="yangjl0930@gmail.com", 
+            runinfo = c(TRUE, "jyanglab", 2, "2G", "8:00:00") )
+
+
+
+```
+
+### ULA Kmeans
+
+```{r}
+trainfile3 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/ULA/kmeans", 
+                        pattern="train", full.names=TRUE)
+testfile3 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/ULA/kmeans", 
+                      pattern="test", full.names=TRUE)
+
+inputdf <- data.frame(pi=0.995,
+   geno="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/genotype/raw_snp0.7M.txt.newbin",
+   trainpheno=trainfile3,
+   testpheno=testfile3,
+   chainLength=41000, burnin=1000, varGenotypic=2, varResidual=1,
+   out=gsub("_train.txt|.*\\/", "", trainfile3))
+
+run_GenSel4(inputdf, cv=TRUE, 
+            inpdir="largedata/ULA/kmeans", 
+            cmdno=1,
+            shid = "slurm-script/run_gensel_array3.sh", remove=FALSE,
+            email="yangjl0930@gmail.com", 
+            runinfo = c(TRUE, "jyanglab", 2, "2G", "8:00:00") )
+
+
+```
+
+### ULA Random
+
+```{r}
+
+trainfile4 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/ULA/random", 
+                        pattern="train", full.names=TRUE)
+testfile4 <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/ULA/random", 
+                      pattern="test", full.names=TRUE)
+
+inputdf <- data.frame(pi=0.995,
+   geno="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/genotype/raw_snp0.7M.txt.newbin",
+   trainpheno=trainfile4,
+   testpheno=testfile4,
+   chainLength=41000, burnin=1000, varGenotypic=2, varResidual=1,
+   out=gsub("_train.txt|.*\\/", "", trainfile4))
+
+run_GenSel4(inputdf, cv=TRUE, 
+            inpdir="largedata/ULA/random", 
+            cmdno=1,
+            shid = "slurm-script/run_gensel_array4.sh", remove=FALSE,
+            email="yangjl0930@gmail.com", 
+            runinfo = c(TRUE, "jyanglab", 2, "2G", "8:00:00") )
+
+```
+
+
+
+## Obtain the results
+
+```{r}
+f <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/pheno/", 
+                pattern="ghatREL", full.names=TRUE)
+
+library("data.table")
+
+out <- data.frame()
+for(i in 1:length(f)){
+   df <- fread(f[i], data.table=FALSE)
+   r <- cor(df$gHat, df$DTS, method="pearson")
+   tem <- data.frame(r=r, file=f[i])
+   out <- rbind(out, tem)
+}
+
+```
+
+

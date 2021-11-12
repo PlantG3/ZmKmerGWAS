@@ -1,0 +1,56 @@
+---
+title: "Genotype data from Gen"
+output: NULL
+author: Jinliang Yang
+---
+
+
+/common/jyanglab/gxu6/project/07_282panel_GCTB/genotype
+
+
+
+
+## Obtain the results
+
+```{r}
+
+library("data.table")
+
+getr <- function(f){
+   out <- data.frame()
+   for(i in 1:length(f)){
+      df <- fread(f[i], data.table=FALSE)
+      r <- cor(df$gHat, df[, 3], method="pearson")
+      tem <- data.frame(r=abs(r), file=f[i])
+      out <- rbind(out, tem)
+   }
+   return(out)
+}
+
+f <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/FT/kmeans", 
+                pattern="ghatREL", full.names=TRUE)
+out1 <- getr(f)
+
+f <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/FT/random", 
+                pattern="ghatREL", full.names=TRUE)
+out2 <- getr(f)
+
+f <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/ULA/kmeans", 
+                pattern="ghatREL", full.names=TRUE)
+out3 <- getr(f)
+
+f <- list.files(path="/common/jyanglab/jyang21/projects/Kmer-GS/largedata/ULA/random", 
+                pattern="ghatREL", full.names=TRUE)
+out4 <- getr(f)
+
+
+
+out <- rbind(out1, out2, out3, out4)
+out$pheno <- gsub(".*largedata/", "", out$file)
+out$method <- gsub("\\/set.*", "", out$pheno)
+out$method <- gsub(".*\\/", "", out$method)
+out$pheno <- gsub("\\/.*", "", out$pheno)
+write.table(out[,-2], "cache/GS_results_03112021.csv", sep=",", row.names = FALSE, quote=FALSE)
+```
+
+
