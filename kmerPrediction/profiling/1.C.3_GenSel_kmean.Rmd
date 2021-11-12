@@ -1,5 +1,5 @@
 ---
-title: "Genotype data from Gen"
+title: "SNP-based GS for kmean"
 output: NULL
 author: Jinliang Yang
 ---
