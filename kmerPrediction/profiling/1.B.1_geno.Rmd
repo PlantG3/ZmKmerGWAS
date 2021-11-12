@@ -1,5 +1,5 @@
 ---
-title: "Genotypic Data from Gen"
+title: "Recode Genotypic Data"
 output: NULL
 author: Jinliang Yang
 ---
