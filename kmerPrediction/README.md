@@ -2,7 +2,7 @@
 
 # README
 
-Code for conventional genomic selection using SNPs
+Code (see `\profiling` folder) for the conventional SNP-based genomic selection using `GenSel` software package.
 
 ### Sample data 
 
