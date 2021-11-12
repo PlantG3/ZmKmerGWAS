@@ -1,5 +1,5 @@
 ---
-title: "Genotype data from Gen"
+title: "Test run for GS"
 output: NULL
 author: Jinliang Yang
 ---
