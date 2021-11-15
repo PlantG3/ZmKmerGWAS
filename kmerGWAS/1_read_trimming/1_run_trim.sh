@@ -1,0 +1,13 @@
+perl /homes/liu3zhen/local/slurm/trimmomatic/trimmomatic.sbatch.pl \
+        --java "Java/1.8.0_144" \
+        --mem 16 \
+        --time 12:00:00 \
+        --trim_shell "./trimmomatic.pe.sh" \
+        --trimmomatic "/path to trimmomatic/trimmomatic-0.36.jar" \
+        --adaptor_file "/path to trimmomatic adapt DB/GA_TruSeq.fa" \
+        --indir "<path to raw reads directory>" \
+        --outdir "." \
+        --fq1feature "_1.fastq.gz" \
+        --fq2feature "_2.fastq.gz" \
+        --threads 1 \
+        --min_len 50
