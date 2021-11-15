@@ -1,0 +1,6 @@
+num <- read.delim("kmer_num_in_261_summary.txt")
+head(num)
+pdf("Fig1b.distribution_of_kmer_numbers_in_maize282.pdf")
+hist(num$sum_kmer,col="gray",breaks=30,xlim=c(3E8,1E9),xaxt="n",ylim=c(0,60),xlab="Number of lines",ylab="Number of k-mers",cex.lab=1.5,cex.axis=1.5,main="")
+axis(1,at=c(seq(from=3E8,to=1E9,by=1E8)),labels = c("0.3","0.4","0.5","0.6","0.7","0.8","0.9","1"),cex.axis=1.5)
+dev.off()
