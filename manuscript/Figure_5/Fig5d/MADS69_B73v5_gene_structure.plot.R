@@ -1,24 +1,25 @@
 # setting
-geno <- "B73v5"
-setwd(".")
+geno <- "B73"
+setwd(paste0("/bulk/liu3zhen/research/projects/kmerGWAS/main/5_NAMchr3/5h_assocKmers/5h1_MAD69/", geno))
+
 colors <- c("olivedrab4", "lightsalmon3")
 par(mgp=c(2, 0.6, 0), mar=c(3.5, 3.5, 3, 0.5))
-pdfout <- "Fig5d.MADS69_B73v5_gene_strucutre.pdf"
+pdfout <- "5h6o_assoc.on.B73.MAD69_100kb.pdf"
 # data
-dataPath <- "B73v5_MADS69"
-faslen <- read.delim(paste0(dataPath, "/B73v5_MADS69.2.Zm00001d036982.length"), header=F)
+dataPath <- "MAD69flank100kb"
+faslen <- read.delim(paste0(dataPath, "/MAD69flank100kb.4.Zm00001eb143080.length"), header=F)
 maxlen <- faslen[1,2]
-beds <- dir(path=paste0(dataPath, "/B73v5_MADS69.4.pos.adjusted.gtf.bed"), pattern="bed$", full.names=T)
+beds <- dir(path=paste0(dataPath, "/", dataPath, ".2.transcripts"), pattern="bed$", full.names=T)
 nbeds <- length(beds)
 
-negative_map_sam <- "B73v5_MADS69_k.negative.mapping.sam"
-positive_map_sam <- "B73v5_MADS69_k.positive.mapping.sam"
+negative_map_sam <- "5h2o_k.negative.mapping.sam"
+positive_map_sam <- "5h2o_k.positive.mapping.sam"
 
 # plot
-pdf(pdfout, width=6, height=5)
-main_info <- paste0("ULA k-mers on MADS69 (", geno, ")")
-plot(NULL, NULL, xlim=c(1, maxlen), ylim=c(0, nbeds+1),
-     xlab="position (bp)", ylab="", yaxt="n", cex.lab=1.2, cex.axis=1.2,
+pdf(pdfout, width=6, height=4.5)
+main_info <- paste0("ULA assocKmers on the MAD69 region (", geno, ")")
+plot(NULL, NULL, xlim=c(1, maxlen), ylim=c(0, nbeds+2),
+     xlab="position (bp)", ylab="", yaxt="n",
      main=main_info)
 base <- 0.4
 exonheight <- 0.4
@@ -45,19 +46,19 @@ for (bed in beds) {
     color <- beddata[i, 7]
     rect(xleft=beddata[i,2], xright=beddata[i,3],
          ybottom=base-exonheight/2, ytop=base+exonheight/2,
-         col=as.character(color), border=as.character(color))
+         col=color, border=color)
   }
   
   # transcript information
   transcript <- gsub(".adjusted.bed", "", gsub(".*\\/", "", bed))
   text(0, base+exonheight, labels=transcript, pos=4)
   
-  base <- base + 0.8
+  base <- base + 1
 }
 
 # indicate gene location
 rect(xleft=gstart, xright=gend,
-     ybottom=base, ytop=base+1.6,
+     ybottom=base-0.4, ytop=base+1.6,
      col="gray90", border=NA)
 
 # assocKmers
@@ -83,8 +84,8 @@ pval2pos <- function(p, pbottom, ptop, pos_bottom, pos_top) {
 # lines and axis of pvals
 ypos_lines <- pval2pos(neglog10pval_bottom:neglog10pval_top, neglog10pval_bottom, neglog10pval_top, base_bottom, base_top)
 abline(h=ypos_lines, col="gray80", lwd=0.8)
-axis(2, at=ypos_lines, labels = neglog10pval_bottom:neglog10pval_top, las=2, cex.axis=1.2)
-mtext(text=substitute(paste("-log10(", italic(p), ")")), side=2, line = 2, at=median(ypos_lines), cex=1.2)
+axis(2, at=ypos_lines, labels = neglog10pval_bottom:neglog10pval_top, las=2)
+mtext(text="-log10(p)", side=2, line = 2, at=median(ypos_lines))
 
 # kmer plotting
 for (i in 1:nrow(neg_ak)) {
